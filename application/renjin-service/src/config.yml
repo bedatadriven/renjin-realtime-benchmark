@@ -1,0 +1,16 @@
+server:
+  applicationConnectors:
+    - type: http
+      port: {{{dw.httpPort}}}
+  adminConnectors:
+    - type: http
+      port: {{{dw.httpAdminPort}}}
+
+logging:
+  level: INFO
+
+  appenders:
+    - type: console
+    - type: file
+      currentLogFilename: "{{{path.logDirectory}}}/test.log"
+      archive: false
