@@ -1,9 +1,9 @@
 #!/bin/sh
 
 sudo apt-get update
-supo apt-get install -yq openjdk-9-jre-headless
+sudo apt-get install -yq openjdk-8-jdk-headless
 
-dpkg -i /tmp/fraud-scorer-1.2.deb
+sudo dpkg -i /tmp/fraud-scorer-1.2.deb
 
 sudo service fraud-scorer start
 
