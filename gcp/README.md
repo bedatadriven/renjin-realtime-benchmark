@@ -15,7 +15,7 @@ First, create and download a JSON service key as described in the
 Then, set the following environment variables:
 
 ```
-export GOOGLE_CREDENTIALS=`cat ~/.keys/myaccount.json
+export GOOGLE_CREDENTIALS=`cat ~/.keys/myaccount.json`
 export GOOGLE_PROJECT=renjin-perf-testing
 ```
 

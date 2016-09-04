@@ -16,10 +16,19 @@ resource "google_compute_instance" "opencpu" {
     }
   }
   
-  # Copies our fraudscore package to the 
+  # Copies our fraudscore package to the server
   provisioner "file" {
     source = "application/fraudscore_1.2.tar.gz"
     destination = "/tmp/fraudscore_1.2.tar.gz"
+    connection {
+      user = "ubuntu"
+    }
+  } 
+  
+  # Copy the configuration overrides to a temp folder
+    provisioner "file" {
+    source = "gcp/opencpu.conf"
+    destination = "/tmp/opencpu.conf"
     connection {
       user = "ubuntu"
     }
