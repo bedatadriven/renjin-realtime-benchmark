@@ -1,0 +1,113 @@
+---
+title: "FraudScoreBenchmark"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Introduction
+
+Real-time analytics is a class of problems characterized by a high volume of queries that require an
+immediate response (< 1000 ms).
+
+One example of a real-time analytics problem is credit card fraud scoring. In this case, a predictive
+model might be trained and tested ahead of time, and then deployed to score the probability that each
+new transaction is fraudulent. 
+
+For this benchmark, we've borrowed a very simple fraud model from [Deployr](https://github.com/deployr/java-example-fraud-score-basics) and want to evaluate the performance
+of a number options for deploying the model as a micro service that can queried to score transactions
+in real-time.
+
+We compare two options:
+  * OpenCPU
+  * Renjin, embedded in a Java Servlet running in Jetty
+
+We will evaluate these options according to several criteria:
+  * Latency: the amount of time it takes to receive a response from the server
+  * Throughput: the maximum number of requests per second the microservice can handle
+  * Vertical Scalability: the increase in performance relative to increase in the number of cores
+  
+## Building the Application Under Test
+
+TO WRITE
+
+## Deploying the Application Under Test
+
+TO WRITE
+
+## Benchmarking 
+
+We are using [Apache JMeter](http://jmeter.apache.org/) to load test the microservice.
+
+The `benchmark.sh` script uses `terraform` and `jmeter` to automate the testing of each hardware
+and load permutation:
+  
+  * Virtual machine with 4, 8, and 16 cores
+  * 10, 50, 100, 200, and 500 concurrent requests
+
+JMeter is set up to write the results of each permutation to the `results/` directory. 
+
+## Processing the results
+
+
+
+```{r process}
+
+result.files <- list.files("../results", pattern = "*.csv")
+
+sumtab <- data.frame()
+for(i in seq_along(result.files)) {
+  # Result files are stored in the following format:
+  # (renjin|opencpu)-(cores)-(users).csv
+  parts <- strsplit(result.files[i], split = ".", fixed = TRUE)[[1]]
+  params <- strsplit(parts[[1]][1], split = "-", fixed = TRUE)[[1]]
+  results <- read.csv(file.path("..", "results", result.files[i]))
+
+  numRequests <- nrow(results)
+  numSuccessfulRequests <- sum(results$success == "true")
+  
+  # For latency, find the median and the 95% percentile 
+  latency <- quantile(results$Latency, c(0.5, 0.95))
+  
+  # Throughput (number of requests / total time)
+  startTime <- results$timeStamp
+  endTime <- startTime + results$elapsed
+  runTime <- (max(endTime) - min(startTime)) / 1000
+  throughput <- numSuccessfulRequests / runTime
+  
+  # Find the percentage of requests that failed
+  successRate <- numSuccessfulRequests / numRequests
+  
+  sumtab[i, "solution"] <- params[1]
+  sumtab[i, "cores"] <- as.integer(params[2])
+  sumtab[i, "users"] <- as.integer(params[3])
+  sumtab[i, "throughput"] <- throughput
+  sumtab[i, "latency.median"] <- latency[1]
+  sumtab[i, "latency.pctl95"] <- latency[2]
+  sumtab[i, "success"] <- successRate
+}
+
+sumtab <- sumtab[ order(sumtab$solution, sumtab$cores, sumtab$users), ]
+knitr::kable(sumtab)
+```
+
+```{r summary_graph, echo=FALSE}
+
+library(ggplot2)
+sumtab$solcores <- factor(sprintf("%s - %d cores", sumtab$solution, sumtab$cores))
+ggplot(sumtab, aes(users, throughput, colour = solcores)) + geom_line()
+
+```
+
+
+## Including Plots
+
+You can also embed plots, for example:
+
+```{r pressure, echo=FALSE}
+plot(pressure)
+```
+
+Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.
