@@ -1,0 +1,9 @@
+.Rproj.user
+.Rhistory
+.RData
+.Ruserdata
+*~
+*.log
+*.tar.gz
+*.tfstate
+*.tfstate.backup
