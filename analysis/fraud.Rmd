@@ -5,6 +5,7 @@ output: html_document
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
+library(ggplot2)
 ```
 
 ## Introduction
@@ -22,7 +23,7 @@ in real-time.
 
 We compare two options:
   * OpenCPU
-  * Renjin, embedded in a Java Servlet running in Jetty
+  * Renjin, embedded in the Jetty HTTP server
 
 We will evaluate these options according to several criteria:
   * Latency: the amount of time it takes to receive a response from the server
@@ -83,6 +84,7 @@ for(i in seq_along(result.files)) {
   sumtab[i, "solution"] <- params[1]
   sumtab[i, "cores"] <- as.integer(params[2])
   sumtab[i, "users"] <- as.integer(params[3])
+  sumtab[i, "runtime"] <- runTime
   sumtab[i, "throughput"] <- throughput
   sumtab[i, "latency.median"] <- latency[1]
   sumtab[i, "latency.pctl95"] <- latency[2]
@@ -93,21 +95,58 @@ sumtab <- sumtab[ order(sumtab$solution, sumtab$cores, sumtab$users), ]
 knitr::kable(sumtab)
 ```
 
-```{r summary_graph, echo=FALSE}
 
-library(ggplot2)
-sumtab$solcores <- factor(sprintf("%s - %d cores", sumtab$solution, sumtab$cores))
-ggplot(sumtab, aes(users, throughput, colour = solcores)) + geom_line()
+
+## Computing Maximum Throughput
+
+As the number of concurrent requests to a service increases, a service with fixed resources
+passes through three phases: 
+
+First, the throughput (number of requests per second) increases 
+more or less in step with the number of concurrent requests as unused capacity is put to work.
+
+Once available capacity has been exhausted, the throughput plateaus and the latency begins to rise. 
+For the purpose of this benchmark, we consider the throughput at this plateau to be the
+*maximum throughput*. 
+
+Finally, once the server is saturated, additional concurrency can only be handled by queuing requests,
+which leads to increasing latency. Eventually, as the costs of maintaining the queue rise, throughput
+starts decreasing.
+
+Looking at only the results from the 4-core, 16-GB virtual machine running on the Google Cloud
+Platform, Renjin running embedded in the Jetty Server scales comfortable up to a peak throughput 
+of 367 requests/second, while the same R code running in OpenCPU maxes out at 21 requests/second.
+
+Even at the lowest tested level of load, with ten concurrent users, Renjin+Jetty responds with a
+median latency of 31 ms, compared to a median latency of 465 ms by OpenCPU, a factor of 15.
+
+
+``` {r sumtab4}
+sumtab4 <- subset(sumtab, cores == 4)
+```
+
+```{r throughput_4core, echo=FALSE}
+
+ggplot(sumtab4, aes(users, throughput, colour = solution)) + geom_line() +
+  ggtitle("4-core") +
+  xlab("Concurrent requests") +
+  ylab("Throughput (reqs / second)")
+
+```
+
+```{r latency_4core, echo=FALSE}
+
+ggplot(sumtab4, aes(users, latency.median, colour = solution)) + geom_line() +
+  ggtitle("4-core") +
+  xlab("Concurrent requests") +
+  ylab("Median Latency (ms)")
 
 ```
 
 
-## Including Plots
+## Vertical Scalability
 
-You can also embed plots, for example:
+Vertical scalability is the ability to increase the throughput of an application by increasing
+the size of server, for example from 4 cores to 8 cores. 
 
-```{r pressure, echo=FALSE}
-plot(pressure)
-```
-
-Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.
+  
