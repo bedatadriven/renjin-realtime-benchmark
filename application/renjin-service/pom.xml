@@ -93,8 +93,8 @@
         <configuration>
           <configTemplate>${basedir}/src/config.yml</configTemplate>
           <jvm>
-            <memory>2g</memory>
-            <packageName>openjdk-8-jdk</packageName>
+            <memory>64gb</memory>
+            <packageName>openjdk-8-jdk-headless</packageName>
           </jvm>
           <dropwizard>
             <httpPort>8080</httpPort>
