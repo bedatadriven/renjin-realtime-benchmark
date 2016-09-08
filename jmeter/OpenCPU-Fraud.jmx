@@ -101,7 +101,7 @@
                 <idleTime>true</idleTime>
               </value>
             </objProp>
-            <stringProp name="filename">${__P(output)}.csv</stringProp>
+            <stringProp name="filename">${__P(output)}</stringProp>
           </ResultCollector>
           <hashTree/>
         </hashTree>
