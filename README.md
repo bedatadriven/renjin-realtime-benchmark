@@ -5,8 +5,8 @@
 We use a simple example of a credit card scoring model written in R, borrowed from the DeployR 
 [Microsoft/java-example-fraud-score](https://github.com/Microsoft/java-example-fraud-score) repository:
 
-* [application/fraudscore] contains the R code reformatted as package that can be used with OpenCPU
-* [application/renjin-service] contains the same code embedded in a Java microservice using Jetty as an embedded server
+* [application/fraudscore](application/fraudscore) contains the R code reformatted as package that can be used with OpenCPU
+* [application/renjin-service](application/renjin-service) contains the same code embedded in a Java microservice using Jetty as an embedded server
 
 Ensure that [GNU R](http://www.r-project.org) and [Apache Maven 3+](https://maven.apache.org/download.cgi) are installed
 and then run `./build.sh` to build both projects. 
@@ -19,7 +19,7 @@ configuration files to automatically setup and deploy configuration for the Goog
 To start, [download](https://www.terraform.io/downloads.html) and configure
 the `terraform` binary. 
 
-Once you have [setup(gcp/README.md) your GCP project and your local environment, run
+Once you have [setup](gcp/README.md) your GCP project and your local environment, run
 
     terraform apply gcp
   
@@ -37,7 +37,7 @@ The OpenCPU solution requires a POST request:
 ## Load Testing
 
 The [jmeter](jmeter) directory contains parametrized test plans for [Apache JMeter](http://jmeter.apache.org/). 
-The [run.sh](run.sh) shell script runs a series of JMeter load tests with increasing permutations of virtual machine
+The [benchmark.sh](benchmark.sh) shell script runs a series of JMeter load tests with increasing permutations of virtual machine
 profiles and number of concurrent users. Requests logs are written to the [results/](results/) folder.
 
 ## Analysis
