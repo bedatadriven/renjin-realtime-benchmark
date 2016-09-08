@@ -43,6 +43,11 @@
       <version>4.1-10-b55</version>
     </dependency>
     <dependency>
+      <groupId>org.apache.commons</groupId>
+      <artifactId>commons-pool2</artifactId>
+      <version>2.2</version>
+    </dependency>
+    <dependency>
       <groupId>junit</groupId>
       <artifactId>junit</artifactId>
       <version>4.11</version>
@@ -93,7 +98,7 @@
         <configuration>
           <configTemplate>${basedir}/src/config.yml</configTemplate>
           <jvm>
-            <memory>64gb</memory>
+            <memory>8g</memory>
             <packageName>openjdk-8-jdk-headless</packageName>
           </jvm>
           <dropwizard>
