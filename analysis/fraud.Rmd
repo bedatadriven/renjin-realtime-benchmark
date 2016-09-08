@@ -30,13 +30,6 @@ We will evaluate these options according to several criteria:
   * Throughput: the maximum number of requests per second the microservice can handle
   * Vertical Scalability: the increase in performance relative to increase in the number of cores
   
-## Building the Application Under Test
-
-TO WRITE
-
-## Deploying the Application Under Test
-
-TO WRITE
 
 ## Benchmarking 
 
@@ -149,4 +142,18 @@ ggplot(sumtab4, aes(users, latency.median, colour = solution)) + geom_line() +
 Vertical scalability is the ability to increase the throughput of an application by increasing
 the size of server, for example from 4 cores to 8 cores. 
 
+```{r compute_max_throughput}
+maxthru <- aggregate(throughput ~ solution + cores, data = sumtab, FUN = max)
+knitr::kable(maxthru)
+```
+
+```{r max_thru_graph, echo=FALSE}
+
+ggplot(maxthru, aes(cores, throughput, colour = solution)) + 
+  geom_point() + geom_line() +
+  ggtitle("Vertical scalability") +
+  xlab("Cores") +
+  ylab("Maximum Throughput (req/s)")
+
+```
   
