@@ -7,3 +7,4 @@
 *.tar.gz
 *.tfstate
 *.tfstate.backup
+results
